@@ -2,6 +2,7 @@ part of pestisland.post.post_edit.bloc;
 
 class PostEditBloc extends TBloc<PostEditEvent, PostEditState> {
   final List<String> imagesLocalPath = <String>[];
+  final List<String> imagesServerDeleted = <String>[];
   String title = '';
   double price = -1;
   String description = '';
@@ -57,7 +58,9 @@ class PostEditBloc extends TBloc<PostEditEvent, PostEditState> {
   }
 
   Stream<PostEditState> _handleAddImageEvent(AddImageEvent event) async* {
-    imagesLocalPath.add(event.imageLocalPath ?? "");
+    String image = event.imageLocalPath ?? "";
+
+    imagesLocalPath.add(image);
     if (imagesLocalPath != null)
       yield ImageState(imagesLocalPath);
     else
@@ -65,6 +68,10 @@ class PostEditBloc extends TBloc<PostEditEvent, PostEditState> {
   }
 
   Stream<PostEditState> _handleRemoveImageEvent(RemoveImageEvent event) async* {
+    String image = imagesLocalPath[event.index];
+    if (UrlUtils.isImageUrlFormat(image) && imagesServerDeleted != null) {
+      imagesServerDeleted.add(image);
+    }
     imagesLocalPath.removeAt(event.index);
     if (imagesLocalPath != null)
       yield ImageState(imagesLocalPath);
